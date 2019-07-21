@@ -135,8 +135,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            this.namesArrayList.remove(position);
-            this.adapter.notifyDataSetChanged();
+            namesArrayList.remove(position); //remove the item in the clicked position
+            adapter.notifyDataSetChanged(); //refresh the list after removing the item
+            lv.setAdapter(adapter); //call the all item list adapter
             Toast.makeText(getApplicationContext(), "Name deleted!", Toast.LENGTH_LONG).show();
         }
     }
