@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/imageview"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/add_user"/>
 
     <TextView
         android:id="@+id/txtname"
@@ -12,6 +20,7 @@
         android:text="Name"
         android:textColor="#323232"
         android:textSize="18dp"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:layout_marginLeft="10dp"/>
 
 </LinearLayout>

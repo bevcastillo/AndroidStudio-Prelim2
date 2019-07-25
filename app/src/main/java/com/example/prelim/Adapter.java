@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -15,9 +16,6 @@ public class Adapter extends BaseAdapter {
     //data container
     ArrayList<Names> list;
     LayoutInflater inflater;
-
-    //constructor
-
 
     public Adapter(Context context, ArrayList<Names> list) {
         this.context = context;
@@ -47,17 +45,21 @@ public class Adapter extends BaseAdapter {
             holder = new ViewHolder();
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.custom_layout, parent, false);
+            holder.image = (ImageView) convertView.findViewById(R.id.imageview);
             holder.name = (TextView) convertView.findViewById(R.id.txtname);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder) convertView.getTag();
         }
         //inflate
+        holder.image.setImageURI(list.get(position).getImageUri());
         holder.name.setText(list.get(position).getName());
+
         return convertView;
     }
 
     static class ViewHolder{
+        ImageView image;
         TextView name;
     }
 }
