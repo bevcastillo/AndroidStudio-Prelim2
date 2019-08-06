@@ -3,24 +3,18 @@ package com.example.prelim;
 import android.net.Uri;
 
 public class Names {
-    Uri imageUri;
-    int id;
-    String name;
+    private int id;
+    private String name;
+    private Uri imageUri;
 
-    //constructor
-    public Names(Uri imageUri, int id, String name) {
-        this.imageUri = imageUri;
-        this.id = id;
-        this.name = name;
-    }
+//    public Names(int id, String name, Uri imageUri) {
+//        this.id = id;
+//        this.name = name;
+//        this.imageUri = imageUri;
+//    }
 
-    //getters and setters
-    public Uri getImageUri() {
-        return imageUri;
-    }
 
-    public void setImageUri(Uri imageUri) {
-        this.imageUri = imageUri;
+    public Names() {
     }
 
     public int getId() {
@@ -37,5 +31,13 @@ public class Names {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Uri getImageUri() {
+        return imageUri;
+    }
+
+    public void setImageUri(Uri imageUri) {
+        this.imageUri = imageUri;
     }
 }

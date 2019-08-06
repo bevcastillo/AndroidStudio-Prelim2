@@ -9,24 +9,24 @@ import android.net.Uri;
 
 import java.util.ArrayList;
 
+/*
+    created by Beverly May Castillo on July 31,2019
+ */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    static String DATABASE = "namedb";
-    static String NAMES = "namestbl";
+    static String DATABASE = "dbnames";
+    static String NAMESTBL = "namestbl";
     static String COL_ID = "id";
-    static String COL_NAME = "name";
     static String COL_IMAGE = "image";
+    static String COL_NAME = "name";
 
-    public DatabaseHelper(Context context){
+    public DatabaseHelper(Context context) {
         super(context, DATABASE, null, 1);
     }
 
-    private static final String CREATE_TABLE_NAMES = "CREATE TABLE "
-            + NAMES + "("
-            + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COL_IMAGE + " TEXT, "
-            + COL_NAME + " URI);";
+    private static final String CREATE_TABLE_NAMES = " CREATE TABLE " + NAMESTBL + "(id INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_IMAGE + " TEXT, " + COL_NAME +" TEXT)";
 
+    //calling the create table query
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_NAMES);
@@ -34,37 +34,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS '" + NAMES + "' ");
-        onCreate(db);
+        db.execSQL("DROP TABLE IF EXISTS '" + NAMESTBL + "'");
     }
 
-    //method to insert the data into the database
-    public void addNames(Uri image, String name){
-        SQLiteDatabase database = this.getWritableDatabase();
+    public long addNames(String image, String myname){
+        SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues cv = new ContentValues();
-//        cv.put(COL_IMAGE, image);
-        cv.put(COL_NAME, name);
-        database.insert(DATABASE, null, cv);
+        cv.put(COL_IMAGE, image);
+        cv.put(COL_NAME, myname);
+
+        long insert = db.insert(NAMESTBL,null,cv);
+        return insert;
     }
 
-    //method to display all data from the database to the listvie
-    public ArrayList<Names> getAll(){
-        ArrayList<Names> namesArrayList = new ArrayList<Names>();
 
-        String selectQuery = "SELECT * FROM " + NAMES;
+    public ArrayList<Names> getAll(){
+        ArrayList<Names> list = new ArrayList<Names>();
+
+        String selectQuery = "SELECT * FROM " + NAMESTBL;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery,null);
 
-        //loop
         if(c.moveToFirst()){
             do{
-//                Names names = new Names();
-//                names.setId(c.getInt(c.getColumnIndex(COL_ID)));
-//                names.setImageUri(c.getBlob(c.getColumnIndex(COL_IMAGE)));
-//                names.setName(c.getString(c.getColumnIndex(COL_NAME)));
+                Names names = new Names();
+                names.setId(c.getInt(c.getColumnIndex(COL_ID)));
+                names.setImageUri(Uri.parse(c.getString(c.getColumnIndex(COL_IMAGE))));
+                names.setName(c.getString(c.getColumnIndex(COL_NAME)));
+                list.add(names);
             }while (c.moveToNext());
         }
-        return namesArrayList;
+        return list;
     }
 
+    public int updateNames(int id,String image, String myname){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_IMAGE, image);
+        cv.put(COL_NAME, myname);
+
+        return db.update(NAMESTBL,cv,COL_ID +" = ? ", new String[]{String.valueOf(id)});
+    }
+
+    public void deleteNames(int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(NAMESTBL, COL_ID + " = ? ", new String[]{String.valueOf(id)});
+    }
 }

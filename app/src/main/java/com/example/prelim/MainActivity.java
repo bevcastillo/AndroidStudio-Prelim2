@@ -26,14 +26,16 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-        Uri imageUri;
+        DatabaseHelper db;
 
+        Uri imageUri;
         EditText textsearch;
         ListView lv;
         AlertDialog.Builder builder;
         ArrayList<Names> namesArrayList = new ArrayList<>(); //arraylist to display all data
         ArrayList<Names> findnames = new ArrayList<>(); //arraylist to display filter search
         Adapter adapter;
+        private Names names;
 
         private static final int PICK_IMAGE = 100;
 
@@ -44,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             textsearch = (EditText) findViewById(R.id.textsearch);
             lv = (ListView) findViewById(R.id.listview);
+
+            db = new DatabaseHelper(this);
+            namesArrayList = db.getAll();
 
             adapter = new Adapter(this, namesArrayList);
             final Adapter mAdapter = new Adapter(this, findnames); //adapter for searchlist array
@@ -129,11 +134,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     if(!textName.getText().toString().equals("")){
                         String name = textName.getText().toString();
-                        Names names = new Names(imageUri, name);
-                        adapter.list.add(names);
                         adapter.notifyDataSetChanged();
                         lv.setAdapter(adapter);
-                        Toast.makeText(getApplicationContext(), "Item added!", Toast.LENGTH_SHORT).show();
+                        long result = db.addNames(String.valueOf(imageUri),name);
+                        if(result > 0){
+                            Toast.makeText(getApplicationContext(), "New Item added!", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+                        }
                     }else{
                         Toast.makeText(getApplicationContext(), "Fields can not be empty!", Toast.LENGTH_SHORT).show();
                     }
@@ -154,9 +162,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            namesArrayList.remove(position); //remove the item in the clicked position
-            adapter.notifyDataSetChanged(); //refresh the list after removing the item
-            lv.setAdapter(adapter); //call the all item list adapter
+//            namesArrayList.remove(position);
+            db.deleteNames(names.getId());
+            adapter.notifyDataSetChanged();
+            lv.setAdapter(adapter);
             Toast.makeText(getApplicationContext(), "Name deleted!", Toast.LENGTH_LONG).show();
         }
 
