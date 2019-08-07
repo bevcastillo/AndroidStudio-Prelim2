@@ -68,6 +68,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    public Cursor getData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + NAMESTBL;
+        Cursor data = db.rawQuery(query, null);
+        return data;
+    }
+
     public int updateNames(int id,String image, String myname){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();

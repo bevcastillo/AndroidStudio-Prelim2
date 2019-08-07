@@ -32,10 +32,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         EditText textsearch;
         ListView lv;
         AlertDialog.Builder builder;
+        ArrayList<Names> list = new ArrayList<Names>();
         ArrayList<Names> namesArrayList = new ArrayList<>(); //arraylist to display all data
         ArrayList<Names> findnames = new ArrayList<>(); //arraylist to display filter search
-        Adapter adapter;
-        private Names names;
+        Adapter adapter, adapter1;
+        private Names names = new Names();
 
         private static final int PICK_IMAGE = 100;
 
@@ -48,11 +49,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             lv = (ListView) findViewById(R.id.listview);
 
             db = new DatabaseHelper(this);
-            namesArrayList = db.getAll();
+            list = db.getAll();
 
+            adapter1 = new Adapter(this, list);
             adapter = new Adapter(this, namesArrayList);
             final Adapter mAdapter = new Adapter(this, findnames); //adapter for searchlist array
-            lv.setAdapter(adapter);
+            lv.setAdapter(adapter1);
+            adapter.notifyDataSetChanged();
 
             //
             builder = new AlertDialog.Builder(this);
@@ -70,11 +73,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     String s1 = s.toString();
                     Pattern pattern = Pattern.compile(s1);
 
-                    for (int i=0; i<namesArrayList.size(); i++){
-                        String find = namesArrayList.get(i).getName().toLowerCase();
+                    for (int i=0; i<list.size(); i++){
+                        String find = list.get(i).getName().toLowerCase();
                         Matcher matcher = pattern.matcher(find);
                         if(matcher.find()){
-                            findnames.add(namesArrayList.get(i));
+                            findnames.add(list.get(i));
                             lv.setAdapter(mAdapter); //call the second adapter when search is called
                             adapter.notifyDataSetChanged();
                         }//end if
@@ -117,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             final EditText textName = (EditText) dialogView.findViewById(R.id.editName);
             final ImageView image = (ImageView) dialogView.findViewById(R.id.editImage);
-            image.setImageURI(imageUri); //setting the drawable image to display the uploaded image Uri
+            image.setImageURI(imageUri);
 
             image.setOnClickListener(new View.OnClickListener() { //adding listener to the imageview
                 @Override
@@ -134,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     if(!textName.getText().toString().equals("")){
                         String name = textName.getText().toString();
-                        adapter.notifyDataSetChanged();
-                        lv.setAdapter(adapter);
+                        adapter1.notifyDataSetChanged();
+                        lv.setAdapter(adapter1);
                         long result = db.addNames(String.valueOf(imageUri),name);
                         if(result > 0){
                             Toast.makeText(getApplicationContext(), "New Item added!", Toast.LENGTH_SHORT).show();
@@ -162,11 +165,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//            namesArrayList.remove(position);
-            db.deleteNames(names.getId());
-            adapter.notifyDataSetChanged();
-            lv.setAdapter(adapter);
-            Toast.makeText(getApplicationContext(), "Name deleted!", Toast.LENGTH_LONG).show();
+//            db.deleteNames(names.getId());
+//            list.remove(position);
+//            adapter.notifyDataSetChanged();
+//            lv.setAdapter(adapter);
+//            Integer getid = names.getId();
+//            String name = names.getName();
+            adapter.getItem(position);
+//            Toast.makeText(getApplicationContext(), "Name deleted!", Toast.LENGTH_LONG).show();
         }
 
     @Override
