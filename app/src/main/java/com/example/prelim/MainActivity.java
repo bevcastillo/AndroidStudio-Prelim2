@@ -32,10 +32,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         EditText textsearch;
         ListView lv;
         AlertDialog.Builder builder;
-        ArrayList<Names> list = new ArrayList<Names>();
-        ArrayList<Names> namesArrayList = new ArrayList<>(); //arraylist to display all data
-        ArrayList<Names> findnames = new ArrayList<>(); //arraylist to display filter search
-        Adapter adapter, adapter1;
+        ArrayList<Names> list = new ArrayList<Names>(); //this is my reference list
+        ArrayList<Names> displaylist = new ArrayList<Names>(); //arraylist to display all data
+//        ArrayList<Names> findnames = new ArrayList<>(); //arraylist to display filter search
+        Adapter adapter, adapter1, madapter;
         private Names names = new Names();
 
         private static final int PICK_IMAGE = 100;
@@ -49,12 +49,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             lv = (ListView) findViewById(R.id.listview);
 
             db = new DatabaseHelper(this);
-            list = db.getAll();
+            displaylist = db.getAll();
 
-            adapter1 = new Adapter(this, list);
-            adapter = new Adapter(this, namesArrayList);
-            final Adapter mAdapter = new Adapter(this, findnames); //adapter for searchlist array
-            lv.setAdapter(adapter1);
+//            adapter1 = new Adapter(this, list);
+            adapter = new Adapter(this, displaylist);
+            Adapter madapter = new Adapter(this, list);
+            lv.setAdapter(adapter);
+//            lv.setAdapter(madapter);
             adapter.notifyDataSetChanged();
 
             //
@@ -69,16 +70,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    findnames.clear();
+                    list.clear();
                     String s1 = s.toString();
                     Pattern pattern = Pattern.compile(s1);
 
-                    for (int i=0; i<list.size(); i++){
-                        String find = list.get(i).getName().toLowerCase();
+                    for (int i=0; i<displaylist.size(); i++){
+                        String find = displaylist.get(i).getName().toLowerCase();
                         Matcher matcher = pattern.matcher(find);
                         if(matcher.find()){
-                            findnames.add(list.get(i));
-                            lv.setAdapter(mAdapter); //call the second adapter when search is called
+                            list.add(displaylist.get(i));
+                            lv.setAdapter(adapter);
                             adapter.notifyDataSetChanged();
                         }//end if
                     }
@@ -137,10 +138,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     if(!textName.getText().toString().equals("")){
                         String name = textName.getText().toString();
-                        adapter1.notifyDataSetChanged();
-                        lv.setAdapter(adapter1);
+
                         long result = db.addNames(String.valueOf(imageUri),name);
+                        Names names = new Names(imageUri, name);
+
+                        list.add(names);
+                        lv.setAdapter(madapter);
+                        madapter.notifyDataSetChanged();
                         if(result > 0){
+
                             Toast.makeText(getApplicationContext(), "New Item added!", Toast.LENGTH_SHORT).show();
                         }else{
                             Toast.makeText(getApplicationContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
@@ -165,14 +171,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//            db.deleteNames(names.getId());
-//            list.remove(position);
-//            adapter.notifyDataSetChanged();
-//            lv.setAdapter(adapter);
-//            Integer getid = names.getId();
-//            String name = names.getName();
-            adapter.getItem(position);
-//            Toast.makeText(getApplicationContext(), "Name deleted!", Toast.LENGTH_LONG).show();
+            Names selecteditem = displaylist.get(position);
+            int nameid = selecteditem.getId();
+            db.deleteNames(nameid);
+            list.remove(names);
+            displaylist.remove(names);
+            adapter.notifyDataSetChanged();
+            if(nameid!=0){
+                Toast.makeText(getApplicationContext(),"Deleted successfully.", Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(getApplicationContext(),"Unable to delete item.", Toast.LENGTH_LONG).show();
+
+            }
         }
 
     @Override

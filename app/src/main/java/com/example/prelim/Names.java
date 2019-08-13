@@ -17,6 +17,9 @@ public class Names {
     public Names() {
     }
 
+    public Names(Uri imageUri, String name) {
+    }
+
     public int getId() {
         return id;
     }
